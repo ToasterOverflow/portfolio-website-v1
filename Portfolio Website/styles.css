@@ -1,0 +1,682 @@
+/* Disable scrolling for About page */
+body.about {
+  overflow: hidden;
+  padding: 2rem; /* Add this to match index.html */
+}
+
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.page-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 9999;
+  transform: translateX(100%); /* start offscreen to the right */
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* slide-in forward (→ left) */
+.page-transition.active {
+  transform: translateX(0);
+}
+
+/* slide-in backward (← right) */
+.page-transition.active.backward {
+  transform: translateX(-100%);
+}
+
+/* reverse direction for slide-out when page loads (optional) */
+.page-transition.reverse {
+  transform: translateX(-100%);
+}
+
+@keyframes curtainFromLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+
+/* --- Logo slide animation --- */
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  display: inline-block;
+  position: relative;
+  transition: transform 0.7s cubic-bezier(0.77,0,0.175,1), opacity 0.7s ease;
+}
+
+/* Slide out left when navigating forward (Home → About → CV) */
+.logo.slide-out-left {
+  transform: translateX(-120%);
+  opacity: 0;
+}
+
+/* Slide out right when going backward (CV → About → Home) */
+.logo.slide-out-right {
+  transform: translateX(120%);
+  opacity: 0;
+}
+
+/* Enter from right */
+.logo.slide-in-right {
+  transform: translateX(120%);
+  opacity: 0;
+  animation: logoEnterFromRight 0.7s cubic-bezier(0.77,0,0.175,1) forwards;
+}
+
+/* Enter from left */
+.logo.slide-in-left {
+  transform: translateX(-120%);
+  opacity: 0;
+  animation: logoEnterFromLeft 0.7s cubic-bezier(0.77,0,0.175,1) forwards;
+}
+
+@keyframes logoEnterFromRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes logoEnterFromLeft {
+  from { transform: translateX(-120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* --- Header + Nav slide animation --- */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  overflow: hidden; /* hides offscreen text while sliding */
+  transition: transform 0.7s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.7s ease;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  contain: layout paint style;  /* isolates header from rest of layout */
+  perspective: 1000px;          /* stabilizes transform edges */
+}
+
+.site-header a,
+.site-header .logo {
+  transform: translateZ(0); /* force them to same layer */
+  backface-visibility: hidden;
+}
+
+.site-header.transitioning * {
+  pointer-events: none; /* prevent accidental hover flicker */
+}
+
+/* slide whole header left/right */
+.site-header.slide-out-left {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.site-header.slide-out-right {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.site-header.slide-in-right {
+  transform: translateX(100%);
+  opacity: 0;
+  animation: headerEnterFromRight 0.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.site-header.slide-in-left {
+  transform: translateX(-100%);
+  opacity: 0;
+  animation: headerEnterFromLeft 0.7s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes headerEnterFromRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes headerEnterFromLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* General Styling */
+body {
+  font-family: sans-serif;
+  background-color: #fff;
+  color: #000;
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Header - Unified style */
+
+
+.main-nav a {
+  margin-left: 1.5rem;
+  text-decoration: none;
+  color: black;
+  font-size: 1rem;
+}
+
+/* Gallery Grid */
+.project-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Individual Project Box */
+body.home-page .project-card {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid black;
+  height: 120px;
+  width: 100%;
+  transition: height 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
+  display: block;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+body.home-page .project-card.hovering {
+  height: 260px;
+  opacity: 1;
+  filter: brightness(1);
+}
+
+/* Smooth shrinking effect for non-active boxes */
+body.home-page .project-gallery .project-card {
+  transition: height 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
+}
+
+/* Shrink non-hovered projects when one is active */
+body.home-page .project-gallery:has(.hovering) .project-card:not(.hovering) {
+  height: 80px;             /* ⬅️ this controls how thin they become */
+  opacity: 0.6;
+  filter: brightness(0.85);
+}
+
+body.home-page .project-gallery:hover .project-card {
+  opacity: 0.6;
+  filter: brightness(0.9);
+}
+
+body.home-page .project-gallery .project-card.hovering {
+  opacity: 1;
+  filter: brightness(1);
+}
+
+/* Project Image */
+body.home-page .project-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  line-height: 0;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+
+}
+
+body.home-page .project-card img[alt="Particles cover page"] {
+  object-position: center bottom;
+}
+
+body.home-page .project-card img[alt="Disrupt building render"] {
+  object-position: center center;
+}
+
+body.home-page .project-card img[alt="Pavilion cover photo"] {
+  object-position: center center;
+}
+
+body.home-page .project-card img[alt="studio plan cover"] {
+  object-position: center center;
+}
+
+
+body.home-page .project-card img[alt="cover full shot image"] {
+  object-position: left center;
+}
+/* Overlay on Hover */
+body.home-page .project-card .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* faint white */
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s ease-in;
+}
+
+body.home-page .project-card.hovering .overlay {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* Overlay Text */
+body.home-page .overlay p {
+  font-size: 1.2rem;
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+}
+
+.about-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 6rem); /* full height minus header */
+  gap: 2rem;
+}
+
+/* Statement Box */
+.statement-box {
+  border: 2px solid black;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  line-height: 1.6;
+  background-color: white;
+  text-align: left;
+}
+
+/* Contact Links */
+.contact-links {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.contact-links a {
+  text-decoration: none;
+  color: black;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.contact-links a:hover {
+  color: gray;
+}
+
+/* CV PAGE ONLY */
+.cv-page {
+  overflow-y: auto;
+  font-size: 0.75rem;
+}
+.cv-title {
+  text-align: center;
+  text-transform: uppercase;
+}
+.cv-subtitle {
+  text-align: center;
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+  font-size: 0.8rem;
+}
+.cv-align {
+  text-align: center;
+  text-transform: uppercase;
+  border-bottom: 1px solid black;
+  font-size: 0.85rem;
+  margin-top: 1.5rem;
+}
+.karla-cv {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+.karla-cv-bold {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+.karla-cv-italic {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: italic;
+}
+footer {
+  text-align: center;
+  font-size: 0.65rem;
+  color: #888;
+  margin-top: 1rem;
+}
+
+#download-pdf {
+  display: block;
+  margin: 1rem auto 2rem;
+  padding: 0.5rem 1.5rem;
+  background-color: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+#download-pdf:hover {
+  background-color: #333;
+}
+
+@media print {
+  /* Hide elements not needed in print */
+  #download-pdf,
+  footer {
+    display: none !important;
+  }
+
+  /* Ensure the whole CV fits cleanly */
+  body.cv-page {
+    font-size: 10pt;
+    color: black;
+    background: white;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cv-container {
+    display: block;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cv-left,
+  .cv-right {
+    max-width: 100%;
+    flex: none;
+    padding: 0;
+  }
+
+  .cv-left h1,
+  .cv-left p,
+  .cv-right h2,
+  .cv-right ul,
+  .cv-right h3,
+  .cv-right li {
+    text-align: left !important;
+    margin: 0.25rem 0;
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: black;
+    text-decoration: none;
+  }
+
+  /* Avoid cutting off mid-section */
+  h2, h3 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  ul {
+    padding-left: 1rem;
+  }
+}
+
+@media print {
+  /* ...existing styles... */
+
+  .print-copyright {
+    display: block;
+    text-align: center;
+    font-size: 8pt;
+    color: #444;
+    margin-top: 2rem;
+    page-break-inside: avoid;
+  }
+}
+
+/* ---------- Responsive Design ---------- */
+
+/* 🖥️ Large screens (desktop default, 1200px and up) */
+@media (min-width: 1200px) {
+  body.home-page .project-card {
+    height: 100px;
+  }
+
+  body.home-page .project-card.hovering {
+    height: 280px;
+  }
+
+  body.home-page .project-gallery {
+    gap: 1.2rem;
+  }
+}
+
+/* 💻 Medium screens (tablets, 768px–1199px) */
+@media (max-width: 1199px) and (min-width: 768px) {
+  body.home-page .project-card {
+    height: 110px;
+  }
+
+  body.home-page .project-card.hovering {
+    height: 220px;
+  }
+
+  body.home-page .project-gallery {
+    gap: 0.8rem;
+  }
+
+  body.home-page .project-gallery:has(.hovering) .project-card:not(.hovering) {
+    height: 60px;
+  }
+
+  body.home-page .project-card {
+    border-width: 1.5px;
+  }
+}
+
+/* 📱 Small screens (phones, below 768px) */
+@media (max-width: 767px) {
+  body.home-page .project-card {
+    height: 90px;
+  }
+
+  body.home-page .project-card.hovering {
+    height: 180px;
+  }
+
+  body.home-page .project-gallery:has(.hovering) .project-card:not(.hovering) {
+    height: 50px;
+  }
+
+  body.home-page .project-gallery {
+    gap: 0.6rem;
+  }
+
+  body.home-page .project-card {
+    border-width: 1px;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .main-nav a {
+    font-size: 0.9rem;
+    margin-left: 1rem;
+  }
+
+  body {
+    padding: 1rem;
+  }
+}
+/* ---------- End of Responsive Design ---------- */
+
+@media (hover: none) {
+  body.home-page .project-card:active {
+    filter: brightness(0.85);
+    transition: filter 0.15s ease;
+  }
+}
+
+/* ---------- Project Page Styles ---------- */
+
+/* ---------- Header + Nav ---------- */
+
+body.project-detail {
+  padding-top: 0px; /* match nav height */
+}
+
+body.project-detail .project-page img[alt="Hero Image"] {
+  width: 100%;
+  height: 80vh;
+  display: block;
+  object-fit: cover;
+  margin-bottom: 2rem;
+}
+
+body.project-detail .project-page > .project-media:first-of-type {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+
+
+.project-header h1.karla-title {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.project-header h2.karla-subtitle {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 1.2rem;
+  font-weight: 400;
+  font-style: normal;
+  margin-bottom: 1.5rem;
+}
+
+.project-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8rem;
+}
+.project-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-header .project-description {
+  margin-left: 0;
+  max-width: 800px;
+  max-height: none;
+  margin-bottom: 2rem;
+}
+
+.karla-description {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 1rem;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.project-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgb(255, 255, 255); /* prevent text overlap */
+  opacity: 50%;
+}
+
+/* ---------- Project Content Grid ---------- */
+
+.project-grid-1col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.project-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.project-grid-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.project-grid-4col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.project-media > * {
+  min-width: 0;
+}
+
+.margin-top {
+  margin-top: 2rem;
+}
+
+.margin-bot {
+  margin-bottom: 2rem;
+}
+
+.project-media img, .project-media video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  margin: 0;
+}
+
+.project-description, .project-description {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 1rem;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.karla-bold {
+  font-family: "Karla", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.project-grid-4col > p { grid-column: 1 / -1; }
+
